@@ -1,4 +1,24 @@
+/*
+ * Copyright 2009 Erik Gilling
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 #include <sys/time.h>
+
+#include "Soma.hh"
+#include "FlameProtoThread.hh"
+#include "LedProtoThread.hh"
 
 Soma::Soma()
 {
@@ -34,24 +54,24 @@ Soma::Soma()
 
 Soma::~Soma()
 {
-	if (ledProto)
-		delete ledProto;
+	if (ledProtoThread)
+		delete ledProtoThread;
 
-	if (flameProto)
-		delete flameProto;
+	if (flameProtoThread)
+		delete flameProtoThread;
 }
 
 
 void Soma::attachLedLink(Link *l)
 {
-	ledProto = new LedProtoThread(this, l);
-	ledProto->start();
+	ledProtoThread = new LedProtoThread(this, l);
+	ledProtoThread->start();
 }
 
 void Soma::attachFlameLink(Link *l)
 {
-	flameProto = new FlameProtoThread(this, l);
-	flameProto->start();
+	flameProtoThread = new FlameProtoThread(this, l);
+	flameProtoThread->start();
 }
 
 void Soma::run(void)
@@ -67,19 +87,22 @@ void Soma::run(void)
 	gettimeofday(&last_tv, NULL);
 	while(1) {
 		sync();
-
 		processFrame();
 
 		gettimeofday(&tv, NULL);
 		timersub(&tv, &last_tv, &tmp_tv);
 		if (timercmp(&tmp_tv, &frametime, <)) {
 			timersub(&frametime, &tmp_tv, &tv);
-			usleep(tv.u_sec);
+			usleep(tv.tv_usec);
 			gettimeofday(&last_tv, NULL);
 		} else {
 			fprintf(stderr, "frame overrun!\n");
 		}
 	}
+}
+
+void Soma::processFrame(void)
+{
 }
 
 void Soma::sync(void)
@@ -97,18 +120,12 @@ void Soma::sync(void)
 	ledLocks[!ledIdx].unlock();
 }
 
-void Soma::sync(void)
-{
-}
-
-
 void Soma::flameSync(void)
 {
 	int newIdx = !flameIdx;
 
 	// Soma is holding flameIdx
 	// flameLink is holding newIdx
-
 	flameLocks[newIdx].unlock();
 
 	// Soma will update flameIdx before releasing this lock

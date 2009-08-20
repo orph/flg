@@ -65,7 +65,8 @@ private:
 	friend void handle_relay(void *data, uint8_t idx, uint8_t state);
 	friend void handle_long_data(void *data, uint32_t val);
 	friend void handle_sync(void *data);
-	friend void handle_send(void *data, uint8_t *pkt_data, int len);
+	friend void handle_flame_send(void *data, uint8_t *pkt_data, int len);
+	friend void handle_led_send(void *data, uint8_t *pkt_data, int len);
 
 	friend void state_page(struct mg_connection *conn,
 			       const struct mg_request_info *ri, void *data);
@@ -85,11 +86,18 @@ public:
 
 	void startWebServer(int port);
 
+	// XXX-ewg: not plumbed from anywhere... eeek  maybe start
+	// a thread
 	void ping(void);
 
-	void send(uint8_t c);
-	uint8_t recv(void);
-	bool hasData(void);
+	void flameSend(uint8_t c);
+	uint8_t flameRecv(void);
+	bool flameHasData(void);
+
+	void ledSend(uint8_t c);
+	uint8_t ledRecv(void);
+	bool ledHasData(void);
+
 };
 
 

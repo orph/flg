@@ -70,20 +70,26 @@ void state_page(struct mg_connection *conn,
 		const struct mg_request_info *ri, void *data)
 {
 	SimState *s = (SimState *)data;
- 	s->statePage(conn, ri);
+	s->statePage(conn, ri);
 }
 
 
 
 SimState::SimState(void)
 {
-	handlers.relay= handle_relay;
-	handlers.long_data = handle_long_data;
-	handlers.sync = handle_sync;
+	flameHandlers.relay= handle_relay;
+	flameHandlers.send= handle_flame_send;
+
+	ledHandlers.long_data = handle_long_data;
+	ledHandlers.sync = handle_sync;
+	ledHandlers.send= handle_led_send;
 
 	memset(lightState, 0x0, sizeof(lightState));
 
-	outputBuff = new RingBuff(outputBuffSize);
+	flameOutputBuff = new RingBuff(outputBuffSize);
+	// led output buff is not stricly needed as the led boards
+	// in incapable of talkng back... obedient little slaves
+	ledOutputBuff = new RingBuff(outputBuffSize);
 }
 
 bool SimState::loadLightMapping(const char * fileName)
@@ -112,11 +118,11 @@ void SimState::addLedRgb(string name, uint8_t addr)
 	memset(&p->p, 0x0, sizeof(p->p));
 	p->p.addr = addr;
 	p->p.handler_data = p;
-	p->p.handlers = &handlers;
+	p->p.handlers = &ledHandlers;
 
 	proto_init(&p->p, addr);
 
-	ledProtos.insert(protos.end(), p);
+	ledProtos.insert(ledProtos.end(), p);
 }
 
 void SimState::addRelay3(string name, uint8_t addr)
@@ -129,12 +135,12 @@ void SimState::addRelay3(string name, uint8_t addr)
 	memset(&p->p, 0x0, sizeof(p->p));
 	p->p.addr = addr;
 	p->p.handler_data = p;
-	p->p.handlers = &handlers;
+	p->p.handlers = &flameHandlers;
 	p->p.widgets = relay3_widgets;
 
 	proto_init(&p->p, addr);
 
-	flameProtos.insert(protos.end(), p);
+	flameProtos.insert(flameProtos.end(), p);
 }
 
 void SimState::startWebServer(int port)

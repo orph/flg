@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-#include <LedProtoThread.hh>
+#include "LedProtoThread.hh"
+#include "Soma.hh"
 
 LedProtoThread::LedProtoThread(Soma *s, Link *l) :
 	Thread()
@@ -27,7 +28,7 @@ LedProtoThread::LedProtoThread(Soma *s, Link *l) :
 	minAddr = 0xff;
 	maxAddr = 0x0;
 	for (i = 0; i < Soma::nLights; i++) {
-		uint8_t addr = soma.getLightAddr(i);
+		uint8_t addr = soma->getLightAddr(i);
 		minAddr = addr < minAddr ? addr : minAddr;
 		maxAddr = addr > maxAddr ? addr : maxAddr;
 	}
@@ -55,8 +56,8 @@ int LedProtoThread::run(void)
 		soma->ledSync();
 
 		for (i = 0; i < Soma::nLights; i++) {
-			uint8_t addr = soma.getLightAddr(i);
-			ledState[addr - minAddr] = soma.getLight(i);
+			uint8_t addr = soma->getLightAddr(i);
+			ledState[addr - minAddr] = soma->getLight(i);
 		}
 		proto->setLights(minAddr, ledState, maxAddr - minAddr);
 		proto->sync(PROTO_ADDR_BCAST);
@@ -65,19 +66,19 @@ int LedProtoThread::run(void)
 	}
 }
 
-void FlameProtoThread::relay(uint8_t idx, uint8_t state)
+void LedProtoThread::relay(uint8_t idx, uint8_t state)
 {
 }
 
-void FlameProtoThread::light(uint8_t idx, uint8_t val)
+void LedProtoThread::light(uint8_t idx, uint8_t val)
 {
 }
 
-void FlameProtoThread::dpot(uint8_t idx, uint8_t val)
+void LedProtoThread::dpot(uint8_t idx, uint8_t val)
 {
 }
 
-void FlameProtoThread::resp(struct proto_packet *pkt)
+void LedProtoThread::resp(struct proto_packet *pkt)
 {
 }
 

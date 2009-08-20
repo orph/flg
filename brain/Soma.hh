@@ -17,6 +17,7 @@
 #ifndef __Soma_hh__
 #define __Soma_hh__
 
+#include <Thread.hh>
 #include <Proto.hh>
 
 class FlameProtoThread;
@@ -49,8 +50,8 @@ private:
 	Thread::Mutex flameLocks[2];
 	Thread::Mutex ledLocks[2];
 
-	FlameProtoThread *flameProto;
-	LedProtoThread *ledProto;
+	FlameProtoThread *flameProtoThread;
+	LedProtoThread *ledProtoThread;
 
 	bool button(int i) {
 		return state[flameIdx].buttons[i];
@@ -88,12 +89,15 @@ private:
 		state[flameIdx].dpots[i] = val;
 	}
 
+	void sync(void);
+	void processFrame(void);
+
 public:
 	Soma();
 	~Soma();
 
 	void attachLedLink(Link *l);
-	void attachFlameProto(Link *l);
+	void attachFlameLink(Link *l);
 
 	void run(void);
 

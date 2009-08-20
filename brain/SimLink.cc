@@ -64,9 +64,3 @@ bool SimLink::recv(void *data, int *len)
 	*len = realLen;
 	return true;
 }
-
-
-
-
-
-

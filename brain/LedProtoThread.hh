@@ -17,9 +17,14 @@
 #ifndef __LedProtoThread_hh__
 #define __LedProtoThread_hh__
 
+#include <stdint.h>
+
 #include <map>
+using namespace std;
 
 #include <Thread.hh>
+#include <Link.hh>
+#include <Proto.hh>
 
 class Soma;
 
