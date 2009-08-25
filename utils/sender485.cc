@@ -79,7 +79,7 @@ public:
 
 int main(int argc, char *argv[])
 {
-	TtyLink link("/dev/tty.usbserial-0000201AA");
+	TtyLink link("/dev/tty.usbserial-00001004A");
 	Handler h;
 	Proto p(&link, &h, NULL, 0, 0);
 	uint8_t addr;

@@ -49,11 +49,19 @@ private:
 
 	State state[2];
 
+
 	int flameIdx;
 	int ledIdx;
 
-	Thread::Mutex flameLocks[2];
-	Thread::Mutex ledLocks[2];
+	pthread_mutex_t lock;
+	pthread_cond_t frameCond;
+	pthread_cond_t flameCond;
+	pthread_cond_t ledCond;
+
+	volatile bool flameDone;
+	volatile bool ledDone;
+	volatile bool flameFrameDone;
+	volatile bool ledFrameDone;
 
 	FlameProtoThread *flameProtoThread;
 	LedProtoThread *ledProtoThread;

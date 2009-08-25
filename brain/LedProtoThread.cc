@@ -33,7 +33,7 @@ LedProtoThread::LedProtoThread(Soma *s, Link *l) :
 		maxAddr = addr > maxAddr ? addr : maxAddr;
 	}
 
-	ledState = new uint32_t(maxAddr - minAddr);
+	ledState = new uint32_t[maxAddr - minAddr];
 	memset(ledState, 0x0, (maxAddr - minAddr) * sizeof(uint32_t));
 
 	proto = new Proto(link, this, NULL, 0, 0);
@@ -54,7 +54,7 @@ int LedProtoThread::run(void)
 
 	while (1) {
 		soma->ledSync();
-
+#if 1
 		for (i = 0; i < Soma::nLights; i++) {
 			uint8_t addr = soma->getLightAddr(i);
 			ledState[addr - minAddr] = soma->getLight(i);
@@ -64,6 +64,7 @@ int LedProtoThread::run(void)
 		proto->sync(PROTO_ADDR_BCAST);
 		proto->sync(PROTO_ADDR_BCAST);
 		proto->sync(PROTO_ADDR_BCAST);
+#endif
 	}
 }
 

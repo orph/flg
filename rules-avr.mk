@@ -68,7 +68,7 @@ endif
 flash: flash-${basename ${firstword ${filter %.bin, ${TARGETS}}}}
 
 flash-%: %.bin
-	avrdude -p ${AVRDUDE_CPU} -c fg -e -U flash:w:$< ${FUSES}
+	avrdude -p ${AVRDUDE_CPU} -c usbtiny -vvv -e -U flash:w:$< ${FUSES}
 
 clean-host:
 	@rm -f ${LIBFLG_OBJS} ${LIBAVR_OBJS} libavr.a libflg.a 

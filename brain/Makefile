@@ -15,6 +15,9 @@ all: ${TARGETS}
 sim: ${SIM_OBJS}
 	${LINKXX}
 
+test: tmp.o
+	${LINKXX}
+
 sim: ${FLG_DIR}/lib/cxx/libflgxx.a ${FLG_DIR}/lib/c/libflg.a ${FLG_DIR}/lib/lua/src/liblua.a
 
 include ${FLG_DIR}/rules.mk

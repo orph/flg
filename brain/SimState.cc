@@ -220,10 +220,12 @@ void SimState::startWebServer(int port)
 {
 	char buff[16];
 	snprintf(buff, 16, "%d", port);
+
 	ctx = mg_start();
 	mg_set_option(ctx, "ports", buff);
 	mg_set_uri_callback(ctx, "/soma/state", &state_page, this);
 	mg_set_uri_callback(ctx, "/soma/button/*", &button_page, this);
+
 //	mg_set_uri_callback(ctx, "/soma/light/*", &light_page, NULL);
 }
 
@@ -321,8 +323,9 @@ void SimState::flameSend(uint8_t c)
 {
 	vector<SimProto *>::iterator i;
 
-	for (i = flameProtos.begin(); i != flameProtos.end(); i++)
+	for (i = flameProtos.begin(); i != flameProtos.end(); i++) {
 		proto_recv(&(*i)->p, c);
+	}
 }
 
 bool SimState::flameHasData(void)
@@ -339,8 +342,9 @@ void SimState::ledSend(uint8_t c)
 {
 	vector<SimProto *>::iterator i;
 
-	for (i = ledProtos.begin(); i != ledProtos.end(); i++)
+	for (i = ledProtos.begin(); i != ledProtos.end(); i++) {
 		proto_recv(&(*i)->p, c);
+	}
 }
 
 bool SimState::ledHasData(void)

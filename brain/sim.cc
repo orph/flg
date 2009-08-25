@@ -62,9 +62,6 @@ int main(int argc, char *argv)
 	state->addRelay3("s2", 0x99);
 
 
-	flameLink = new SimLink(state, SimLink::FLAME);
-	ledLink = new SimLink(state, SimLink::LED);
-
 	soma = new Soma();
 
 	if (!soma->loadLightMap("brainLed.map"))
@@ -82,10 +79,13 @@ int main(int argc, char *argv)
 	if (!soma->loadKnobMap("brainKnob.map"))
 		return 1;
 
+	flameLink = new SimLink(state, SimLink::FLAME);
+	ledLink = new SimLink(state, SimLink::LED);
+
 	soma->attachFlameLink(flameLink);
 	soma->attachLedLink(ledLink);
 
-	state->startWebServer(8080);
+//	state->startWebServer(8080);
 
 	soma->run();
 }

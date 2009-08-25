@@ -34,11 +34,11 @@ dirname:
 
 %.o: %.c
 	@echo "  CC     " `basename $<`
-	@${CC} -c ${CFLAGS} -o $@ $<
+	${CC} -c ${CFLAGS} -o $@ $<
 
 %.o: %.cc
 	@echo "  C++    " `basename $<`
-	@${CXX} -c ${CXXFLAGS} -o $@ $<
+	${CXX} -c ${CXXFLAGS} -o $@ $<
 
 dirs:
 

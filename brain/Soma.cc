@@ -45,11 +45,16 @@ Soma::Soma()
 	ledProtoThread = NULL;
 	flameProtoThread = NULL;
 
-	ledLocks[0].lock();
-	ledLocks[1].lock();
+	flameDone = false;
+	ledDone = false;
+	flameFrameDone = false;
+	ledFrameDone = false;
 
-	flameLocks[0].lock();
-	flameLocks[1].lock();
+	pthread_mutex_init(&lock, NULL);
+
+	pthread_cond_init(&frameCond, NULL);
+	pthread_cond_init(&flameCond, NULL);
+	pthread_cond_init(&ledCond, NULL);
 }
 
 Soma::~Soma()
@@ -137,21 +142,28 @@ void Soma::run(void)
 	gettimeofday(&last_tv, NULL);
 	while(1) {
 		sync();
+//		printf("\n\n%d\n\n",i);
+
 		processFrame(i++);
 
 		gettimeofday(&tv, NULL);
 		timersub(&tv, &last_tv, &tmp_tv);
 		if (timercmp(&tmp_tv, &frametime, <)) {
 			timersub(&frametime, &tmp_tv, &tv);
+			printf("sleeping for %dus\n", tv.tv_usec);
+			gettimeofday(&tmp_tv, NULL);
 			usleep(tv.tv_usec);
+			gettimeofday(&last_tv, NULL);
+			timersub(&last_tv, &tmp_tv, &tv);
+			printf("slept for %dus\n", tv.tv_usec);
 		} else {
-			fprintf(stderr, "frame overrun: ");
+			fprintf(stderr, "frame overrun %d: ", i);
 			timersub(&flameSyncTime, &last_tv, &tmp_tv);
-			fprintf(stderr, "flameSyncDelay: %f ", 1.0 * tmp_tv.tv_sec +
-			       (1.0 * tmp_tv.tv_usec)/(1000000.0));
+			fprintf(stderr, "flameSyncDelay: %dus ",
+				tmp_tv.tv_usec);
 			timersub(&ledSyncTime, &last_tv, &tmp_tv);
-			fprintf(stderr, "ledSyncDelay: %f ", 1.0 * tmp_tv.tv_sec +
-			       (1.0 * tmp_tv.tv_usec)/(1000000.0));
+			fprintf(stderr, "ledSyncDelay: %dus ",
+				tmp_tv.tv_usec);
 			fprintf(stderr, "\n");
 		}
 		gettimeofday(&last_tv, NULL);
@@ -214,7 +226,7 @@ void Soma::processFrame(int frame)
 		setRelay(i * 3 + 2, button(i));
 	}
 
-	if ((frame % 100) == 0) {
+	if (false && (frame % 100) == 0) {
 		for (i = 0; i < nButtons; i++)
 			printf("%c ", button(i) ? '1' : '0');
 
@@ -227,45 +239,66 @@ void Soma::processFrame(int frame)
 
 void Soma::sync(void)
 {
-	flameLocks[!flameIdx].lock();
-	ledLocks[!ledIdx].lock();
 
-	// we now hold all locks.
-	// It is safe to update flameIdx and ledIdx
+	printf("sync locking\n");
+	pthread_mutex_lock(&lock);
+	printf("%d %d\n", flameDone, ledDone); fflush(stdout);
+	while (!flameDone || !ledDone) {
+		pthread_cond_wait(&frameCond, &lock);
+	}
 	flameIdx = !flameIdx;
 	ledIdx = !ledIdx;
 
-	// now let the link threads run
-	flameLocks[!flameIdx].unlock();
-	ledLocks[!ledIdx].unlock();
+	ledDone = false;
+	flameDone = false;
+
+	flameFrameDone = true;
+	ledFrameDone = true;
+
+
+	pthread_cond_broadcast(&flameCond);
+	pthread_cond_broadcast(&ledCond);
+
+	pthread_mutex_unlock(&lock);
+
+
 }
 
 void Soma::flameSync(void)
 {
-	int newIdx = !flameIdx;
-
 	gettimeofday(&flameSyncTime, NULL);
 
-	// Soma is holding flameIdx
-	// flameLink is holding newIdx
-	flameLocks[newIdx].unlock();
+	pthread_mutex_lock(&lock);
+	flameDone = true;
+	pthread_cond_broadcast(&frameCond);
 
-	// Soma will update flameIdx before releasing this lock
-	flameLocks[!newIdx].lock();
+
+	while (!flameFrameDone) {
+		pthread_cond_wait(&flameCond, &lock);
+	}
+
+	flameFrameDone = false;
+
+	pthread_mutex_unlock(&lock);
 }
+
 
 void Soma::ledSync(void)
 {
-	int newIdx = !ledIdx;
-
 	gettimeofday(&ledSyncTime, NULL);
 
-	// Soma is holding ledIdx
-	// ledLink is holding newIdx
+	pthread_mutex_lock(&lock);
+	ledDone = true;
+	pthread_cond_broadcast(&frameCond);
 
-	ledLocks[newIdx].unlock();
 
-	// Soma will update ledIdx before releasing this lock
-	ledLocks[!newIdx].lock();
+	while (!ledFrameDone) {
+		pthread_cond_wait(&ledCond, &lock);
+	}
+
+	ledFrameDone = false;
+
+	pthread_mutex_unlock(&lock);
+
 }
 
