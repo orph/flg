@@ -95,6 +95,12 @@ Soma::Soma()
         digitalNames.push_back("a8a");
         digitalNames.push_back("a8b");
         digitalNames.push_back("a8c");
+
+        digitalNames.push_back("s1");
+        digitalNames.push_back("s2");
+        digitalNames.push_back("s3");
+        digitalNames.push_back("s4");
+        digitalNames.push_back("s5");
 }
 
 Soma::~Soma()

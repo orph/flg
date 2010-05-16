@@ -19,7 +19,7 @@
 #include <sstream>
 #include <png.h>
 
-#define PNG_WIDTH 74
+#define PNG_WIDTH 79
 
 
 EventMask::EventMask(string mask)
