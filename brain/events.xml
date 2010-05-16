@@ -7,6 +7,8 @@
   <event mask="l11" script="button.png" />
   <event mask="l12" script="button.png" />
   <event mask="l13" script="button.png" />
+  <event mask="l14" script="button.png" />
+  <event mask="l15" script="button.png" />
 
   <event mask="l6 l7" script="btn2.png" />
   <event mask="l7 l8" script="btn2.png" />
@@ -15,6 +17,8 @@
   <event mask="l10 l11" script="btn2.png" />
   <event mask="l11 l12" script="btn2.png" />
   <event mask="l12 l13" script="btn2.png" />
+  <event mask="l13 l14" script="btn2.png" />
+  <event mask="l14 l15" script="btn2.png" />
 
   <event mask="" script="idle.png" />
 </config>
