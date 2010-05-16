@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+#include <stdio.h>
 #include <string.h>
 
 #include <ProtoThread.hh>
@@ -213,6 +214,8 @@ int ProtoThread::run(void)
 
 		page = !page;
 	}
+
+        return 0;
 }
 
 void ProtoThread::relay(uint8_t idx, uint8_t state)
