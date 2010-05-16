@@ -19,6 +19,8 @@
 #include <sstream>
 #include <png.h>
 
+#define PNG_WIDTH 74
+
 
 EventMask::EventMask(string mask)
 {
@@ -79,9 +81,9 @@ EventScript::load(string script)
 	png_read_info(png, info);
 	png_read_update_info(png, info);
 
-        if (info->width != 58) {
-		fprintf(stderr, "Script %s is not the correct width (expected 58, got %lu).\n",
-                        script.c_str(), info->width);
+        if (info->width != PNG_WIDTH) {
+		fprintf(stderr, "Script %s is not the correct width (expected %d, got %lu).\n",
+                        script.c_str(), PNG_WIDTH, info->width);
 #ifndef OSX
                 png_read_destroy(png, info, NULL);
 #endif
@@ -225,7 +227,6 @@ EventMachine::update(State *state,
 	vector< pair<EventScript*, uint> > nextStates;
 	for (vector< pair<EventScript*, uint> >::iterator i2 = scriptStates.begin();
 	     i2 != scriptStates.end(); i2++) {
-		// Call Ben's event updating for the row at index i2->second.
 		EventScript *data = i2->first;
 		uint frame = i2->second;
 

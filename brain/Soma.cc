@@ -71,14 +71,30 @@ Soma::Soma()
 	upperLedNames.push_back("u20a");
 	upperLedNames.push_back("u20c");
 
+        digitalNames.push_back("a1a");
         digitalNames.push_back("a1b");
+        digitalNames.push_back("a1c");
+        digitalNames.push_back("a2a");
         digitalNames.push_back("a2b");
+        digitalNames.push_back("a2c");
+        digitalNames.push_back("a3a");
         digitalNames.push_back("a3b");
+        digitalNames.push_back("a3c");
+        digitalNames.push_back("a4a");
         digitalNames.push_back("a4b");
+        digitalNames.push_back("a4c");
+        digitalNames.push_back("a5a");
         digitalNames.push_back("a5b");
+        digitalNames.push_back("a5c");
+        digitalNames.push_back("a6a");
         digitalNames.push_back("a6b");
+        digitalNames.push_back("a6c");
+        digitalNames.push_back("a7a");
         digitalNames.push_back("a7b");
+        digitalNames.push_back("a7c");
+        digitalNames.push_back("a8a");
         digitalNames.push_back("a8b");
+        digitalNames.push_back("a8c");
 }
 
 Soma::~Soma()
